@@ -6,6 +6,34 @@ This copy includes the phone, Wear OS and web source, project documentation, and
 
 Current implementation guide (reviewed 14 October 2026): [Project documentation](docs/PROJECT_DOCUMENTATION.md) · [Offline HTML guide with screenshots](docs/PROJECT_DOCUMENTATION.html). This guide covers the phone, watch, and web app, and records current runtime limitations. The original overview below predates several implementation changes.
 
+## Screenshots
+
+### Wear OS watch
+
+Captured from the native watch app running on a round Wear OS emulator. Populated player and topic screens use labeled local sample data; a paired phone and real audio playback were not tested. The volume interaction was verified locally.
+
+| Player without phone | Player with sample state | Topic list |
+| --- | --- | --- |
+| <img src="docs/screenshots/05-watch-player.png" alt="Watch player without a paired phone" width="220"> | <img src="docs/screenshots/06-watch-player-sample.png" alt="Watch playback display using sample Science story state" width="220"> | <img src="docs/screenshots/07-watch-topics.png" alt="Watch topic selection using sample topic data" width="220"> |
+
+| Active Science topic | Volume at 7 | Volume adjusted to 13 |
+| --- | --- | --- |
+| <img src="docs/screenshots/08-watch-active-topic.png" alt="Science topic highlighted in orange" width="220"> | <img src="docs/screenshots/09-watch-volume.png" alt="Watch circular volume control at level seven" width="220"> | <img src="docs/screenshots/10-watch-volume-adjusted.png" alt="Watch volume after local adjustment to thirteen" width="220"> |
+
+### Web reader
+
+Captured from the running web application. These are browser screenshots; the native Android phone app was not captured.
+
+| World headlines | Voice settings |
+| --- | --- |
+| ![World headlines](docs/screenshots/01-web-headlines.jpg) | ![Language and speaker settings](docs/screenshots/02-web-voice-settings.jpg) |
+
+| Technology headlines | Audio unavailable |
+| --- | --- |
+| ![Technology topic](docs/screenshots/03-web-technology.jpg) | ![Technology screen after unsuccessful audio request](docs/screenshots/04-web-audio-unavailable.jpg) |
+
+The last web screenshot records an unsuccessful audio request caused by exhausted provider credits. The full guide explains the runtime limitations and the watch's controls and visual design.
+
 A zero-budget AI news app that **scrapes world news → simplifies with Gemini AI → reads aloud with Sarvam TTS**, controllable from your smartwatch.
 
 ---
