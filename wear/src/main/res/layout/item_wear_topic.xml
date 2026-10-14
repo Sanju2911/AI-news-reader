@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/topic_card"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="4dp"
+    android:background="@drawable/bg_topic_chip"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="16dp">
+
+        <!-- Topic name -->
+        <TextView
+            android:id="@+id/tv_topic_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="World"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <!-- Now playing indicator -->
+        <TextView
+            android:id="@+id/tv_now_playing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="♪"
+            android:textColor="#E07A3A"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</FrameLayout>

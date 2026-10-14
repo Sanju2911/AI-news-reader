@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI News Reader</string>
+
+    <!-- Settings dialog -->
+    <string name="settings_title">Voice Settings</string>
+    <string name="language_label">Language</string>
+    <string name="speaker_label">Speaker</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Language options (Sarvam AI supported) -->
+    <string-array name="language_names">
+        <item>English (India)</item>
+        <item>Hindi</item>
+        <item>Tamil</item>
+        <item>Telugu</item>
+        <item>Kannada</item>
+        <item>Malayalam</item>
+        <item>Marathi</item>
+        <item>Bengali</item>
+        <item>Gujarati</item>
+        <item>Punjabi</item>
+    </string-array>
+    <string-array name="language_codes">
+        <item>en-IN</item>
+        <item>hi-IN</item>
+        <item>ta-IN</item>
+        <item>te-IN</item>
+        <item>kn-IN</item>
+        <item>ml-IN</item>
+        <item>mr-IN</item>
+        <item>bn-IN</item>
+        <item>gu-IN</item>
+        <item>pa-IN</item>
+    </string-array>
+
+    <!-- Speaker options (Sarvam AI voices) -->
+    <string-array name="speaker_names">
+        <item>Ritu (Female)</item>
+        <item>Amol (Male)</item>
+        <item>Amartya (Male)</item>
+        <item>Diya (Female)</item>
+        <item>Neel (Male)</item>
+        <item>Maitreyi (Female)</item>
+        <item>Advika (Female)</item>
+        <item>Arjun (Male)</item>
+    </string-array>
+    <string-array name="speaker_ids">
+        <item>ritu</item>
+        <item>amol</item>
+        <item>amartya</item>
+        <item>diya</item>
+        <item>neel</item>
+        <item>maitreyi</item>
+        <item>advika</item>
+        <item>arjun</item>
+    </string-array>
+</resources>

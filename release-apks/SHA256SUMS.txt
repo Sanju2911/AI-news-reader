@@ -1,0 +1,5 @@
+97df9a4cd9290f39df5f44ee4f0c71b0468591f789860614b4e20fdd2d1ddb40  NewsReader-Phone-debug-no-credentials.apk
+3b855e4a2e5856c2405df1f994136a892c9adfe729fd373755d026321735f4dc  NewsReader-WearOS-debug-current.apk
+4c27a2c80dc0b7e6cdb21359a5b52669f04625dda126cf302fdb95734c483fd0  NewsReader-WearOS-v1.0.apk
+5a1b9902afac120a44459e9ec3d5730a68aac6d30f77c2a277e26da3a77f9e8d  NewsReader-WearOS-v1.1.apk
+7575b8b72f13e91184e25f3163285ad9b884887146b854dcc592314a876c7f38  NewsReader-WearOS-v1.2.apk

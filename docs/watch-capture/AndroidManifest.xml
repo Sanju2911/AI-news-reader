@@ -1,0 +1,3 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <instrumentation android:name="com.newsreader.capture.WatchCaptureRunner" android:targetPackage="com.newsreader" android:label="Documentation sample state" />
+</manifest>

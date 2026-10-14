@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bg"
+    android:padding="24dp">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_title"
+        android:textColor="#E07A3A"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="#333333"/>
+
+    <!-- TTS Engine info -->
+    <TextView
+        android:id="@+id/tv_engine_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Engine: Google TTS (Free)"
+        android:textColor="#E07A3A"
+        android:textSize="12sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Use the toggle button on the main screen to switch engines"
+        android:textColor="#666666"
+        android:textSize="10sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#333333"/>
+
+    <!-- Sarvam API Key -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="SARVAM API KEY"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:textAllCaps="true"
+        android:letterSpacing="0.08"/>
+
+    <EditText
+        android:id="@+id/et_api_key"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:background="#2A2A2A"
+        android:padding="10dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#555555"
+        android:textSize="12sp"
+        android:hint="sk_xxxx_xxxxxxxxxxxxxxx"
+        android:inputType="text"
+        android:singleLine="true"
+        android:fontFamily="monospace"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#333333"/>
+
+    <!-- Language Spinner (for Sarvam) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/language_label"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:textAllCaps="true"
+        android:letterSpacing="0.08"/>
+
+    <Spinner
+        android:id="@+id/spinner_language"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="#2A2A2A"
+        android:padding="8dp"
+        android:popupBackground="#2A2A2A"/>
+
+    <!-- Speaker Spinner (for Sarvam) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/speaker_label"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:textAllCaps="true"
+        android:letterSpacing="0.08"/>
+
+    <Spinner
+        android:id="@+id/spinner_speaker"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="#2A2A2A"
+        android:padding="8dp"
+        android:popupBackground="#2A2A2A"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="24dp"
+        android:background="#333333"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/cancel"
+            android:textColor="#999999"
+            android:textSize="13sp"
+            android:background="@android:color/transparent"
+            android:minWidth="80dp"/>
+
+        <Button
+            android:id="@+id/btn_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:text="@string/apply"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:background="@drawable/btn_accent_bg"
+            android:minWidth="100dp"/>
+    </LinearLayout>
+</LinearLayout>
+

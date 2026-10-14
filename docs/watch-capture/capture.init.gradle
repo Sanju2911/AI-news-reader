@@ -1,0 +1,8 @@
+// Opt-in documentation fixture only; does not alter production source or builds.
+gradle.beforeProject { watch ->
+  if (watch.path == ':wear') watch.plugins.withId('com.android.application') {
+    watch.android.defaultConfig.testInstrumentationRunner = 'com.newsreader.capture.WatchCaptureRunner'
+    watch.android.sourceSets.androidTest.java.srcDirs = [new File(gradle.rootProject.projectDir, 'docs/watch-capture')]
+    watch.android.sourceSets.androidTest.manifest.srcFile new File(gradle.rootProject.projectDir, 'docs/watch-capture/AndroidManifest.xml')
+  }
+}

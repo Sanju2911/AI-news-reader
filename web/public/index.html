@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI News Reader</title>
+<style>
+/* ── Reset & Base ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg:         #121212;
+    --bg-header:  #1A1A1A;
+    --bg-card:    #1E1E1E;
+    --bg-elevated:#2A2A2A;
+    --accent:     #E07A3A;
+    --accent-dark:#C46830;
+    --text:       #F0EAE2;
+    --text-sec:   #999999;
+    --text-muted: #666666;
+    --border:     #3A3A3A;
+    --success:    #4CAF50;
+    --radius:     16px;
+}
+
+html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-header);
+    padding: 14px 16px;
+    flex-shrink: 0;
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+}
+
+.header-actions { display: flex; gap: 8px; }
+
+.icon-btn {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--accent);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.icon-btn:hover { background: var(--bg-elevated); }
+.icon-btn:active { transform: scale(0.93); }
+
+/* ── Voice Info Bar ─────────────────────────────────────────────── */
+.voice-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    padding: 6px 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* ── Topic Chips ────────────────────────────────────────────────── */
+.topics-scroll {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    background: var(--bg);
+    flex-shrink: 0;
+}
+.topics-scroll::-webkit-scrollbar { display: none; }
+
+.topic-chips {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    white-space: nowrap;
+}
+
+.chip {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(224, 122, 58, 0.08);
+}
+
+/* ── Loading Bar ────────────────────────────────────────────────── */
+.loading-bar {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+.loading-bar.hidden { display: none; }
+
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── News List ──────────────────────────────────────────────────── */
+.news-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 10px;
+    padding-bottom: 200px;
+    scrollbar-width: thin;
+    scrollbar-color: #333 transparent;
+}
+
+.news-list::-webkit-scrollbar { width: 4px; }
+.news-list::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+.empty-state .emoji { font-size: 40px; display: block; margin-bottom: 12px; }
+
+/* ── News Card ──────────────────────────────────────────────────── */
+.news-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.news-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+.news-card.active-card { border: 1px solid var(--accent); }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.source-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+.source-name {
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.card-image {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 12px;
+    background: var(--bg-elevated);
+    margin-bottom: 10px;
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-summary {
+    font-size: 13px;
+    color: var(--text-sec);
+    line-height: 1.55;
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.card-summary.loading-text { color: var(--accent); }
+.card-summary.placeholder-text { color: var(--text-muted); }
+
+.card-divider {
+    height: 1px;
+    background: var(--bg-elevated);
+    margin-bottom: 10px;
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card-status {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+.card-status.ready { color: var(--success); }
+
+.card-play-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+}
+.card-play-btn:hover { background: var(--accent-dark); transform: scale(1.08); }
+
+/* ── Spinner ────────────────────────────────────────────────────── */
+.spinner {
+    width: 26px; height: 26px;
+    border: 3px solid #333;
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Player Bar ─────────────────────────────────────────────────── */
+.player-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 520px;
+    background: linear-gradient(to top, #1A1A1A 70%, rgba(26,26,26,0.96));
+    backdrop-filter: blur(12px);
+    padding: 14px 16px 18px;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+.topic-label {
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+.track-counter {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.current-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 4px 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.progress-container {
+    height: 3px;
+    background: #333;
+    border-radius: 3px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.ctrl-btn {
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+    color: #ccc;
+    font-size: 16px;
+}
+.ctrl-btn:hover { transform: scale(1.1); }
+.ctrl-btn:active { transform: scale(0.93); }
+
+.ctrl-sec {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+}
+.ctrl-play {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 20px;
+}
+.ctrl-play:hover { background: var(--accent-dark); }
+
+/* ── Settings Modal ─────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 24px;
+    width: 90%;
+    max-width: 380px;
+    transform: scale(0.95);
+    transition: transform 0.2s;
+}
+.modal-overlay.show .modal-content { transform: scale(1); }
+
+.modal-content h2 {
+    font-size: 20px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.modal-divider {
+    height: 1px;
+    background: #333;
+    margin: 16px 0;
+}
+
+.modal-content label {
+    display: block;
+    font-size: 12px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+.modal-content select {
+    width: 100%;
+    height: 44px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    padding: 0 12px;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancel {
+    padding: 8px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-sec);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.btn-cancel:hover { background: var(--bg-elevated); }
+
+.btn-apply {
+    padding: 8px 24px;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.btn-apply:hover { background: var(--accent-dark); }
+
+/* ── Toast ──────────────────────────────────────────────────────── */
+.toast {
+    position: fixed;
+    bottom: 220px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #333;
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 520px) {
+    body { max-width: 100%; }
+    .player-bar { max-width: 100%; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────── -->
+<div class="header">
+    <h1>🎙️ AI News Reader</h1>
+    <div class="header-actions">
+        <button class="icon-btn" id="btnRefresh" title="Refresh news">🔄</button>
+        <button class="icon-btn" id="btnSettings" title="Voice settings">⚙️</button>
+    </div>
+</div>
+
+<!-- ── Voice Info ──────────────────────────────────────────────── -->
+<div class="voice-bar">
+    <span>🔊</span>
+    <span id="voiceInfo">English (India) · Ritu (Female)</span>
+    <span style="margin-left:auto;font-size:10px" id="dataSource"></span>
+</div>
+
+<!-- ── Topic Chips ─────────────────────────────────────────────── -->
+<div class="topics-scroll">
+    <div class="topic-chips" id="topicChips"></div>
+</div>
+
+<!-- ── Loading ─────────────────────────────────────────────────── -->
+<div class="loading-bar hidden" id="loadingBar"></div>
+
+<!-- ── News List ───────────────────────────────────────────────── -->
+<main class="news-list" id="newsList">
+    <div class="empty-state">
+        <span class="emoji">📰</span>
+        Loading news...
+    </div>
+</main>
+
+<!-- ── Player Bar ──────────────────────────────────────────────── -->
+<div class="player-bar">
+    <div class="player-info">
+        <span class="topic-label" id="topicLabel">WORLD</span>
+        <span class="track-counter" id="trackCounter">0 / 0</span>
+    </div>
+    <div class="current-title" id="currentTitle">Loading news...</div>
+    <div class="progress-container">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="player-controls">
+        <button class="ctrl-btn ctrl-sec" id="btnPrev">⏮</button>
+        <button class="ctrl-btn ctrl-play" id="btnPlayPause">▶</button>
+        <button class="ctrl-btn ctrl-sec" id="btnNext">⏭</button>
+    </div>
+</div>
+
+<!-- ── Settings Modal ──────────────────────────────────────────── -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+        <h2>Voice Settings</h2>
+        <div class="modal-divider"></div>
+        <label>Language</label>
+        <select id="langSelect"></select>
+        <label>Speaker</label>
+        <select id="speakerSelect"></select>
+        <div class="modal-divider"></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="btnCancel">Cancel</button>
+            <button class="btn-apply" id="btnApply">Apply</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ───────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════════════════════
+const TOPICS = [
+    { name: 'WORLD',         display: 'World' },
+    { name: 'TECHNOLOGY',    display: 'Tech' },
+    { name: 'BUSINESS',      display: 'Business' },
+    { name: 'SPORTS',        display: 'Sports' },
+    { name: 'HEALTH',        display: 'Health' },
+    { name: 'SCIENCE',       display: 'Science' },
+    { name: 'ENTERTAINMENT', display: 'Entertainment' },
+    { name: 'INDIA',         display: 'India' }
+];
+
+const LANGUAGES = [
+    { name: 'English (India)', code: 'en-IN' },
+    { name: 'Hindi',           code: 'hi-IN' },
+    { name: 'Tamil',           code: 'ta-IN' },
+    { name: 'Telugu',          code: 'te-IN' },
+    { name: 'Kannada',         code: 'kn-IN' },
+    { name: 'Malayalam',       code: 'ml-IN' },
+    { name: 'Marathi',         code: 'mr-IN' },
+    { name: 'Bengali',         code: 'bn-IN' },
+    { name: 'Gujarati',        code: 'gu-IN' },
+    { name: 'Punjabi',         code: 'pa-IN' }
+];
+
+const SPEAKERS = [
+    { name: 'Ritu (Female)',    id: 'ritu' },
+    { name: 'Amol (Male)',      id: 'amol' },
+    { name: 'Amartya (Male)',   id: 'amartya' },
+    { name: 'Diya (Female)',    id: 'diya' },
+    { name: 'Neel (Male)',      id: 'neel' },
+    { name: 'Maitreyi (Female)',id: 'maitreyi' },
+    { name: 'Advika (Female)',  id: 'advika' },
+    { name: 'Arjun (Male)',     id: 'arjun' }
+];
+
+// ══════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+    currentTopic: 'WORLD',
+    articles: [],          // raw GNews articles
+    newsItems: [],         // { id, title, summary, sourceUrl, imageUrl, sourceName, audioBase64, isLoading }
+    playback: { isPlaying: false, currentIndex: 0, progress: 0 },
+    reportGenerated: false,
+    voice: { langIndex: 0, speakerIndex: 0 }
+};
+
+let audio = new Audio();
+let progressInterval = null;
+
+// ══════════════════════════════════════════════════════════════════
+//  DOM REFS
+// ══════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+// ══════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    renderTopicChips();
+    setupPlayerControls();
+    setupSettingsModal();
+    setupKeyboard();
+    loadNews('WORLD');
+});
+
+// ══════════════════════════════════════════════════════════════════
+//  TOPIC CHIPS
+// ══════════════════════════════════════════════════════════════════
+function renderTopicChips() {
+    const container = $('topicChips');
+    container.innerHTML = TOPICS.map(t =>
+        `<button class="chip ${t.name === state.currentTopic ? 'active' : ''}"
+                 data-topic="${t.name}">${t.display}</button>`
+    ).join('');
+
+    container.addEventListener('click', e => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        const topic = chip.dataset.topic;
+        if (topic === state.currentTopic) return;
+        loadNews(topic);
+    });
+}
+
+function updateChipSelection() {
+    document.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.topic === state.currentTopic);
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  LOAD NEWS
+// ══════════════════════════════════════════════════════════════════
+async function loadNews(topic) {
+    state.currentTopic = topic;
+    state.reportGenerated = false;
+    state.playback.currentIndex = 0;
+    state.playback.progress = 0;
+    state.supabaseReportId = null;
+    stopAudio();
+
+    updateChipSelection();
+    showLoading(true);
+    $('topicLabel').textContent = TOPICS.find(t => t.name === topic)?.display || topic;
+    $('currentTitle').textContent = 'Loading news...';
+    $('trackCounter').textContent = '0 / 0';
+    $('progressFill').style.width = '0%';
+    $('dataSource').textContent = '';
+    $('newsList').innerHTML = '<div class="empty-state"><span class="emoji">📰</span>Fetching headlines...</div>';
+
+    try {
+        const res = await fetch(`/api/news/${topic}`);
+        const data = await res.json();
+
+        if (data.error) throw new Error(data.error);
+
+        // ── Data from Supabase (pre-generated report) ─────────────
+        if (data._source === 'supabase' && data._report) {
+            const report = data._report;
+            const segments = report.report_text.split('---NEXT---').map(s => s.trim()).filter(s => s);
+            const articlesInfo = data.articles || [];
+
+            state.supabaseReportId = report.id;
+            state.articles = articlesInfo;
+            state.newsItems = segments.map((seg, i) => ({
+                id: i,
+                title: articlesInfo[i]?.title || `Story ${i + 1}`,
+                summary: seg,
+                sourceUrl: articlesInfo[i]?.url || '',
+                imageUrl: articlesInfo[i]?.image || null,
+                sourceName: articlesInfo[i]?.source?.name || 'News',
+                audioBase64: null,
+                isLoading: false
+            }));
+            state.reportGenerated = true;
+
+            // If Supabase has cached audio, use it
+            if (report.audio_base64) {
+                // Full report audio — for now, individual segments still need TTS
+                console.log('Supabase has cached audio for full report');
+            }
+
+            $('dataSource').textContent = '📦 Supabase';
+            $('dataSource').style.color = '#4CAF50';
+            renderNews();
+            updatePlayerBar();
+            showLoading(false);
+            showToast('Loaded from Supabase cache');
+
+            // Pre-generate TTS for first item
+            prepareTTS(0);
+            return;
+        }
+
+        // ── Fresh data from GNews ─────────────────────────────────
+        state.articles = data.articles || [];
+        state.newsItems = state.articles.map((a, i) => ({
+            id: i,
+            title: a.title,
+            summary: '',
+            sourceUrl: a.url,
+            imageUrl: a.image,
+            sourceName: a.source?.name || 'News',
+            audioBase64: null,
+            isLoading: false
+        }));
+
+        $('dataSource').textContent = '🌐 GNews (live)';
+        $('dataSource').style.color = '#E07A3A';
+        renderNews();
+        updatePlayerBar();
+        showLoading(false);
+
+        // Generate AI report for all articles
+        if (state.articles.length > 0) {
+            generateReport();
+        }
+    } catch (err) {
+        showLoading(false);
+        $('newsList').innerHTML = `<div class="empty-state"><span class="emoji">⚠️</span>Failed to load news: ${err.message}</div>`;
+        showToast('Failed to load news');
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  GENERATE GEMINI REPORT
+// ══════════════════════════════════════════════════════════════════
+async function generateReport() {
+    if (state.reportGenerated) return;
+
+    // Mark all items as loading
+    state.newsItems.forEach(item => item.isLoading = true);
+    renderNews();
+
+    const topicDisplay = TOPICS.find(t => t.name === state.currentTopic)?.display || state.currentTopic;
+
+    try {
+        const res = await fetch('/api/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ articles: state.articles, topicName: topicDisplay, topic: state.currentTopic })
+        });
+        const data = await res.json();
+        const segments = data.segments || [];
+
+        state.reportGenerated = true;
+
+        state.newsItems.forEach((item, i) => {
+            item.summary = segments[i] || item.title;
+            item.isLoading = false;
+        });
+
+        renderNews();
+        updatePlayerBar();
+
+        if (data.saved) {
+            $('dataSource').textContent = '💾 Saved to Supabase';
+            $('dataSource').style.color = '#4CAF50';
+        }
+
+        // Pre-generate TTS for first item
+        prepareTTS(0);
+
+    } catch (err) {
+        state.newsItems.forEach(item => {
+            item.summary = item.title;
+            item.isLoading = false;
+        });
+        renderNews();
+        showToast('AI report failed, using titles');
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TTS
+// ══════════════════════════════════════════════════════════════════
+async function prepareTTS(index) {
+    const item = state.newsItems[index];
+    if (!item || item.audioBase64 || !item.summary) return;
+
+    item.isLoading = true;
+    renderCardStatus(index);
+
+    try {
+        const res = await fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: item.summary,
+                language: LANGUAGES[state.voice.langIndex].code,
+                speaker: SPEAKERS[state.voice.speakerIndex].id
+            })
+        });
+        const data = await res.json();
+
+        if (data.audio) {
+            item.audioBase64 = data.audio;
+        }
+    } catch (err) {
+        console.error('TTS error:', err);
+    }
+
+    item.isLoading = false;
+    renderCardStatus(index);
+
+    // Pre-fetch next
+    if (index + 1 < state.newsItems.length && !state.newsItems[index + 1].audioBase64) {
+        prepareTTS(index + 1);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  AUDIO PLAYBACK
+// ══════════════════════════════════════════════════════════════════
+function playItem(index) {
+    if (index < 0 || index >= state.newsItems.length) return;
+
+    const item = state.newsItems[index];
+    state.playback.currentIndex = index;
+    updatePlayerBar();
+
+    if (!item.summary && !state.reportGenerated) {
+        generateReport();
+        return;
+    }
+
+    if (!item.audioBase64) {
+        prepareTTS(index).then(() => {
+            if (state.newsItems[index].audioBase64) {
+                startPlayback(index);
+            }
+        });
+        return;
+    }
+
+    startPlayback(index);
+}
+
+function startPlayback(index) {
+    const item = state.newsItems[index];
+    if (!item.audioBase64) return;
+
+    stopAudio();
+
+    // Decode base64 → blob → object URL
+    const binary = atob(item.audioBase64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'audio/wav' });
+    audio.src = URL.createObjectURL(blob);
+
+    audio.play().catch(err => console.error('Playback error:', err));
+    state.playback.isPlaying = true;
+    state.playback.currentIndex = index;
+    updatePlayerBar();
+    renderNews();
+    startProgressTracking();
+}
+
+function togglePlayPause() {
+    if (!audio.src || audio.src === '') {
+        playItem(state.playback.currentIndex);
+        return;
+    }
+
+    if (state.playback.isPlaying) {
+        audio.pause();
+        state.playback.isPlaying = false;
+    } else {
+        // If audio ended, restart current item
+        if (audio.ended) {
+            playItem(state.playback.currentIndex);
+            return;
+        }
+        audio.play().catch(() => {});
+        state.playback.isPlaying = true;
+        startProgressTracking();
+    }
+    updatePlayerBar();
+}
+
+function playNext() {
+    const next = state.playback.currentIndex + 1;
+    if (next < state.newsItems.length) {
+        playItem(next);
+    }
+}
+
+function playPrev() {
+    const prev = state.playback.currentIndex - 1;
+    if (prev >= 0) {
+        playItem(prev);
+    }
+}
+
+function stopAudio() {
+    audio.pause();
+    audio.currentTime = 0;
+    state.playback.isPlaying = false;
+    clearInterval(progressInterval);
+}
+
+function startProgressTracking() {
+    clearInterval(progressInterval);
+    progressInterval = setInterval(() => {
+        if (audio.duration > 0) {
+            state.playback.progress = Math.round((audio.currentTime / audio.duration) * 100);
+            $('progressFill').style.width = state.playback.progress + '%';
+        }
+    }, 300);
+}
+
+// Audio ended → auto-advance
+audio.addEventListener('ended', () => {
+    state.playback.isPlaying = false;
+    state.playback.progress = 0;
+    clearInterval(progressInterval);
+    $('progressFill').style.width = '0%';
+    updatePlayerBar();
+
+    // Auto-play next
+    const next = state.playback.currentIndex + 1;
+    if (next < state.newsItems.length) {
+        playItem(next);
+    }
+});
+
+// ══════════════════════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════════════════════
+function renderNews() {
+    const list = $('newsList');
+    if (state.newsItems.length === 0) {
+        list.innerHTML = '<div class="empty-state"><span class="emoji">📰</span>No articles found</div>';
+        return;
+    }
+
+    list.innerHTML = state.newsItems.map((item, i) => {
+        const isActive = i === state.playback.currentIndex && state.playback.isPlaying;
+        let summaryClass = '';
+        let summaryText = '';
+        let statusText = '';
+        let statusClass = '';
+
+        if (item.isLoading) {
+            summaryClass = 'loading-text';
+            summaryText = 'Generating AI report...';
+            statusText = '⏳ Processing...';
+        } else if (item.summary) {
+            summaryText = item.summary;
+            if (item.audioBase64) {
+                statusText = '✓ Ready to play';
+                statusClass = 'ready';
+            } else {
+                statusText = 'Tap to listen';
+            }
+        } else {
+            summaryClass = 'placeholder-text';
+            summaryText = 'Tap play to generate report';
+            statusText = 'Tap to listen';
+        }
+
+        return `
+        <div class="news-card ${isActive ? 'active-card' : ''}" onclick="playItem(${i})">
+            <div class="card-header">
+                <span class="source-dot"></span>
+                <span class="source-name">${escHtml(item.sourceName)}</span>
+            </div>
+            ${item.imageUrl ? `<img class="card-image" src="${escHtml(item.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+            <div class="card-title">${escHtml(item.title)}</div>
+            <div class="card-summary ${summaryClass}">${escHtml(summaryText)}</div>
+            <div class="card-divider"></div>
+            <div class="card-footer">
+                <span class="card-status ${statusClass}">${statusText}</span>
+                ${item.isLoading
+                    ? '<div class="spinner"></div>'
+                    : `<button class="card-play-btn" onclick="event.stopPropagation(); playItem(${i})">▶</button>`
+                }
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderCardStatus(index) {
+    // Quick re-render of a single card's footer
+    const cards = document.querySelectorAll('.news-card');
+    const card = cards[index];
+    if (!card) return;
+
+    const item = state.newsItems[index];
+    const footer = card.querySelector('.card-footer');
+    if (!footer) return;
+
+    let statusText = '';
+    let statusClass = '';
+
+    if (item.isLoading) {
+        statusText = '⏳ Processing...';
+    } else if (item.audioBase64) {
+        statusText = '✓ Ready to play';
+        statusClass = 'ready';
+    } else {
+        statusText = 'Tap to listen';
+    }
+
+    footer.innerHTML = `
+        <span class="card-status ${statusClass}">${statusText}</span>
+        ${item.isLoading
+            ? '<div class="spinner"></div>'
+            : `<button class="card-play-btn" onclick="event.stopPropagation(); playItem(${index})">▶</button>`
+        }`;
+}
+
+function updatePlayerBar() {
+    const items = state.newsItems;
+    const idx = state.playback.currentIndex;
+    const item = items[idx];
+
+    $('topicLabel').textContent = TOPICS.find(t => t.name === state.currentTopic)?.display || '';
+    $('trackCounter').textContent = items.length > 0 ? `${idx + 1} / ${items.length}` : '0 / 0';
+    $('currentTitle').textContent = item ? item.title : 'Loading news...';
+    $('btnPlayPause').textContent = state.playback.isPlaying ? '⏸' : '▶';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SETTINGS MODAL
+// ══════════════════════════════════════════════════════════════════
+function setupSettingsModal() {
+    // Populate selects
+    const langSel = $('langSelect');
+    langSel.innerHTML = LANGUAGES.map((l, i) =>
+        `<option value="${i}">${l.name}</option>`
+    ).join('');
+
+    const spkSel = $('speakerSelect');
+    spkSel.innerHTML = SPEAKERS.map((s, i) =>
+        `<option value="${i}">${s.name}</option>`
+    ).join('');
+
+    $('btnSettings').addEventListener('click', () => {
+        langSel.value = state.voice.langIndex;
+        spkSel.value = state.voice.speakerIndex;
+        $('settingsModal').classList.add('show');
+    });
+
+    $('btnCancel').addEventListener('click', () => {
+        $('settingsModal').classList.remove('show');
+    });
+
+    $('btnApply').addEventListener('click', () => {
+        state.voice.langIndex = parseInt(langSel.value);
+        state.voice.speakerIndex = parseInt(spkSel.value);
+
+        // Clear cached audio
+        state.newsItems.forEach(item => item.audioBase64 = null);
+        renderNews();
+
+        updateVoiceInfo();
+        $('settingsModal').classList.remove('show');
+        showToast(`Voice: ${SPEAKERS[state.voice.speakerIndex].name} · ${LANGUAGES[state.voice.langIndex].name}`);
+    });
+
+    // Close on overlay click
+    $('settingsModal').addEventListener('click', e => {
+        if (e.target === $('settingsModal')) $('settingsModal').classList.remove('show');
+    });
+}
+
+function updateVoiceInfo() {
+    $('voiceInfo').textContent = `${LANGUAGES[state.voice.langIndex].name} · ${SPEAKERS[state.voice.speakerIndex].name}`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  PLAYER CONTROLS
+// ══════════════════════════════════════════════════════════════════
+function setupPlayerControls() {
+    $('btnPlayPause').addEventListener('click', togglePlayPause);
+    $('btnNext').addEventListener('click', playNext);
+    $('btnPrev').addEventListener('click', playPrev);
+    $('btnRefresh').addEventListener('click', () => {
+        showToast('Refreshing news...');
+        loadNews(state.currentTopic);
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════════════════════════════
+function setupKeyboard() {
+    document.addEventListener('keydown', e => {
+        if ($('settingsModal').classList.contains('show')) {
+            if (e.key === 'Escape') $('settingsModal').classList.remove('show');
+            return;
+        }
+
+        switch (e.key) {
+            case ' ':
+                e.preventDefault();
+                togglePlayPause();
+                break;
+            case 'ArrowRight':
+                playNext();
+                break;
+            case 'ArrowLeft':
+                playPrev();
+                break;
+        }
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════════════
+function showLoading(show) {
+    $('loadingBar').classList.toggle('hidden', !show);
+}
+
+function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+</script>
+</body>
+</html>

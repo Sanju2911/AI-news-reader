@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Active / selected topic -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#2A1608"/>
+            <corners android:radius="20dp"/>
+            <stroke android:width="1.5dp" android:color="#E07A3A"/>
+        </shape>
+    </item>
+    <!-- Default topic card -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A1A1A"/>
+            <corners android:radius="20dp"/>
+            <stroke android:width="1dp" android:color="#333333"/>
+        </shape>
+    </item>
+</selector>

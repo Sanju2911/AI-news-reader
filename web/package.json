@@ -1,0 +1,12 @@
+{
+  "name": "newsreader-web",
+  "version": "1.0.0",
+  "description": "AI News Reader — Web Version",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

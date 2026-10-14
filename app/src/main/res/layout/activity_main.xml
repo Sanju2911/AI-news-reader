@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#121212">
+
+    <!-- ── Header ──────────────────────────────────────────────── -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1A1A1A"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/tv_app_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="🎙️ AI News Reader"
+            android:textColor="#E07A3A"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"/>
+
+        <!-- Settings (voice) button -->
+        <ImageButton
+            android:id="@+id/btn_settings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@android:drawable/ic_menu_manage"
+            android:background="@drawable/settings_button_bg"
+            android:tint="#E07A3A"
+            android:padding="8dp"
+            android:contentDescription="Voice settings"/>
+
+        <!-- Manual Refresh button -->
+        <ImageButton
+            android:id="@+id/btn_refresh"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toStartOf="@id/btn_settings"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:src="@android:drawable/ic_menu_rotate"
+            android:background="@drawable/settings_button_bg"
+            android:tint="#E07A3A"
+            android:padding="8dp"
+            android:contentDescription="Refresh news"/>
+    </RelativeLayout>
+
+    <!-- ── Current voice info bar ──────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/voice_info_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#161616"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔊"
+            android:textSize="11sp"/>
+
+        <TextView
+            android:id="@+id/tv_voice_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="English (India) · Ritu"
+            android:textColor="#777777"
+            android:textSize="11sp"
+            android:singleLine="true"/>
+
+        <!-- TTS Engine Toggle -->
+        <TextView
+            android:id="@+id/btn_tts_engine"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:text="Google"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:textColor="#E07A3A"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:background="@drawable/auto_play_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Toggle TTS engine"/>
+    </LinearLayout>
+
+    <!-- ── Topic chips ─────────────────────────────────────────── -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:background="#121212"
+        android:fadingEdgeLength="24dp"
+        android:requiresFadingEdge="horizontal">
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_topics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:chipSpacingHorizontal="6dp"/>
+    </HorizontalScrollView>
+
+    <!-- ── Loading indicator ───────────────────────────────────── -->
+    <ProgressBar
+        android:id="@+id/progress_loading"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        style="?android:progressBarStyleHorizontal"
+        android:indeterminate="true"
+        android:indeterminateTint="#E07A3A"
+        android:visibility="gone"/>
+
+    <!-- ── News list ───────────────────────────────────────────── -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_news"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"/>
+
+    <!-- ── Bottom player bar ───────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/player_bar_bg"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="14dp"
+        android:elevation="16dp">
+
+        <!-- Topic + track counter row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_topic_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="World"
+                android:textColor="#E07A3A"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"/>
+
+            <TextView
+                android:id="@+id/tv_track_counter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="— / —"
+                android:textColor="#666666"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"/>
+        </LinearLayout>
+
+        <!-- Current title -->
+        <TextView
+            android:id="@+id/tv_current_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select a story to play"
+            android:textColor="#E8E0D8"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginTop="6dp"/>
+
+        <!-- Timer row: elapsed — progress bar — duration -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tv_elapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0:00"
+                android:textColor="#999999"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"/>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:max="100"
+                android:progressTint="#E07A3A"
+                android:progressBackgroundTint="#333333"/>
+
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0:00"
+                android:textColor="#999999"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"/>
+        </LinearLayout>
+
+        <!-- TTS generation progress -->
+        <TextView
+            android:id="@+id/tv_tts_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#E07A3A"
+            android:textSize="10sp"
+            android:textAlignment="center"
+            android:visibility="gone"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Playback controls -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/btn_previous"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@android:drawable/ic_media_previous"
+                android:background="@drawable/circle_button_secondary"
+                android:tint="#CCCCCC"
+                android:padding="10dp"
+                android:contentDescription="Previous"/>
+
+            <ImageButton
+                android:id="@+id/btn_play_pause"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:layout_marginHorizontal="20dp"
+                android:src="@android:drawable/ic_media_play"
+                android:background="@drawable/circle_button_bg"
+                android:tint="#FFFFFF"
+                android:padding="12dp"
+                android:contentDescription="Play or Pause"/>
+
+            <ImageButton
+                android:id="@+id/btn_next"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:src="@android:drawable/ic_media_next"
+                android:background="@drawable/circle_button_secondary"
+                android:tint="#CCCCCC"
+                android:padding="10dp"
+                android:contentDescription="Next"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <!-- Auto-play toggle -->
+            <TextView
+                android:id="@+id/btn_auto_play"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="AUTO"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:background="@drawable/auto_play_bg"
+                android:layout_marginEnd="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Toggle auto-play"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

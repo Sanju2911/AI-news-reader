@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Circular progress ring combining bg track + progress -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background ring (gray track) -->
+    <item android:id="@android:id/background">
+        <shape android:shape="ring"
+            android:innerRadiusRatio="2.35"
+            android:thicknessRatio="25"
+            android:useLevel="false">
+            <solid android:color="#333333"/>
+        </shape>
+    </item>
+    <!-- Progress ring (orange) -->
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees="270"
+            android:toDegrees="270">
+            <shape android:shape="ring"
+                android:innerRadiusRatio="2.35"
+                android:thicknessRatio="25"
+                android:useLevel="true">
+                <solid android:color="#E07A3A"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list>
